@@ -2,9 +2,10 @@ import { Text, View, SafeAreaView, ScrollView, ActivityIndicator, RefreshControl
 import { Stack, useRouter, useGlobalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 
-import { Company, JobAbout, JobFooter, JobTabs, ScreenHeaderBtn, Specifics } from '../../components';
+import { Company, About, JobFooter, JobTabs, ScreenHeaderBtn, Specifics, JobAbout } from '../../components';
 import { COLORS, icons, SIZES } from '../../constants';
 import useFetch from '../../hooks/useFetch';
+import { FontDisplay } from 'expo-font';
 
 const JobDetails = () => {
   const params = useGlobalSearchParams();
@@ -14,10 +15,31 @@ const JobDetails = () => {
     job_id: params.id
   })
 
+  const tabs = ["About", "Qualifications", "Responsibilities"];
+
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState(tabs[0]);
 
   const onRefresh = () => {
 
+  }
+
+  const displayTabContent = () => {
+    switch (activeTab) {
+      case "Qualifications":
+        return <Specifics 
+          title="Qualifications"
+          points={ data[0].job_highlights?.Qualifications ?? ['N/A'] }
+        />
+      case "About":
+        return <JobAbout 
+          info={ data[0].job_description ?? "No job description provided" }
+        />
+      case "Responsibilities":
+
+      default: 
+        break;
+    }
   }
 
   return (
@@ -63,8 +85,11 @@ const JobDetails = () => {
                 Location={data[0].job_country}
               />
               <JobTabs 
-                
+                tabs={tabs}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
               />
+              {displayTabContent()}
             </View>
           )}
         </ScrollView>
